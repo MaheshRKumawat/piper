@@ -1,2 +1,2 @@
 # piper
-A data pipeline tool for IBM Code Engine and IBM COS
+A data pipeline tool for IBM Cloud Code Engine and IBM Cloud COS
