@@ -30,7 +30,46 @@ func GenerateJobFile() {
 		file := filepath.Join(folder, filepath.Base(fileName))
 		err := ioutil.WriteFile(file, yamlData, 0644)
 		if err != nil {
-			panic("Unable to write data into the file")
+			panic("Unable to write job.piedpiper.yml into the folder")
+		}
+
+		dockerfile_content := []byte(
+			`FROM golang:1.20
+		RUN apt-get update && \
+			apt-get upgrade -y && \
+			apt-get install -y git
+		RUN git clone https://github.com/MaheshRKumawat/piper
+		COPY ./bash.sh .
+		RUN chmod +x bash.sh
+		CMD ["./bash.sh"]`)
+
+		dockerfile := filepath.Join(folder, filepath.Base("Dockerfile"))
+		err = ioutil.WriteFile(dockerfile, dockerfile_content, 0644)
+		if err != nil {
+			panic("Unable to write dockerfile into the folder")
+		}
+
+		bash_content := []byte(
+		`#!/bin/bash
+
+		cd 
+		go build -o /cos ./piper/cos.go
+
+		/cos input	
+		
+		if [[ $ALL_KEYS_PRESENT == "true"]]; then
+			# Your commands to execute the file
+		else
+			echo "Exit from Bash"
+			return
+		fi
+
+		/cos output`)
+
+		bash := filepath.Join(folder, filepath.Base("bash.sh"))
+		err = ioutil.WriteFile(bash, bash_content, 0644)
+		if err != nil {
+			panic("Unable to write bash file into the folder")
 		}
 	}
 }
