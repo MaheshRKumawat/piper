@@ -113,7 +113,7 @@ func Write_file_to_cos(c COS_Instance, key string, client *s3.S3) (err error) {
 	// Call Function to upload (Put) an object
 	result, err := client.PutObject(&input)
 	if result != nil {
-		log.Print("Preprocessed Object pushed to Cloud Object Storage")
+		log.Print("Object pushed to Cloud Object Storage")
 	}
 
 	return err
