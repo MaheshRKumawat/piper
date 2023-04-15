@@ -3,15 +3,13 @@ package piper
 import (
 	"log"
 	"os"
-
-	cos "github.com/MaheshRKumawat/COS_Connection"
 )
 
 func main() {
 	var p PiedPiper
-	p.GetConf("job.piedpiper.yml")
+	p.GetConf("./job.piedpiper.yml")
 
-	c := cos.COS_Instance{
+	c := COS_Instance{
 		ApiKey:            os.Getenv("API_KEY"),
 		ServiceInstanceID: os.Getenv("RESOURCE_INSTANCE_ID"),
 		AuthEndpoint:      os.Getenv("AUTH_ENDPOINT"),
@@ -19,11 +17,11 @@ func main() {
 		BucketName:        os.Getenv("BUCKET_NAME"),
 	}
 
-	_, ob_keys, client, _ := cos.Connect(c)
+	_, ob_keys, client, _ := Connect(c)
 
 	if os.Args[1] == "input" {
 		for _, ip := range p.Inputs {
-			if !cos.Check_keys(ob_keys, ip) {
+			if !Check_keys(ob_keys, ip) {
 				log.Printf("%v key not present in Cloud Object Storage bucket, hence exiting", ip)
 				os.Setenv("ALL_KEYS_PRESENT", "false")
 				os.Exit(0)
@@ -33,11 +31,11 @@ func main() {
 		os.Setenv("ALL_KEYS_PRESENT", "true")
 
 		for _, ip := range p.Inputs {
-			cos.Read_file_from_cos(c, ip, client)
+			Read_file_from_cos(c, ip, client)
 		}
 	} else if os.Args[1] == "output" {
 		for _, op := range p.Outputs {
-			cos.Write_file_to_cos(c, op, client)
+			Write_file_to_cos(c, op, client)
 		}
 		log.Println("All output object keys pushed")
 	} else {
