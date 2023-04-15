@@ -2,6 +2,7 @@ package piper
 
 import (
 	"io/ioutil"
+	"log"
 	"os"
 	"path/filepath"
 
@@ -25,7 +26,7 @@ func GenerateJobFile() {
 		p.Namespace = project.Namespace
 		p.Tag = folder
 		yamlData, _ := yaml.Marshal(&p)
-		fileName := "job.piedpiper.yaml"
+		fileName := "job.piedpiper.yml"
 		file := filepath.Join(folder, filepath.Base(fileName))
 		err := ioutil.WriteFile(file, yamlData, 0644)
 		if err != nil {
@@ -34,7 +35,21 @@ func GenerateJobFile() {
 	}
 }
 
-func build(){
+func build() {
+	project := Project_PiedPiper{}
+	project.GetConf("project.piedpiper.yml")
+	folders := project.Folders
+
+	projectID, region := getBluemixConf()
+	ceClient := auth(region)
+
+	for _, folder := range folders {
+		fileName := "job.piedpiper.yml"
+		file := filepath.Join(folder, filepath.Base(fileName))
+		generateJob(file, projectID, ceClient)
+	}
+
+	log.Println("Build Job Successful")
 }
 
 func run() {
